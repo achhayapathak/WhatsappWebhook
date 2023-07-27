@@ -4,7 +4,7 @@ const axios = require('axios');
 require('dotenv').config();
 
 const token = process.env.TOKEN;
-const myToken = process.env.MYTOKEN;
+const myToken = "Achhaya";
 
 const app = express();
 
@@ -19,22 +19,23 @@ app.get('/webhook', (req, res) => {
     let mode = req.query["hub.mode"];
     let challenge = req.query["hub.challenge"];
     let token = req.query["hub.verify_token"];
-
-
-    if(mode === "subscribe" && token === myToken) {
-        console.log("success");
-        res.status(200).send(challenge);
+  
+    console.log(mode + challenge + token);
+  
+    if (mode === "subscribe" && token === myToken) {
+      console.log("success");
+      res.status(200).send(challenge);
     } else {
-        console.log("success");
-        res.status(403);
-        
+      console.log("subscription failed");
+      res.status(403).send("Subscription Failed: Invalid Token");
     }
-});
+  });
+  
 
 
 app.post("/webhook", (req, res) => {
     let body = req.body;
-    console.log(JSON.stringify(body, null, 2));
+    console.log(JSON.stringify(body));
     
     if(body.object) {
         if(

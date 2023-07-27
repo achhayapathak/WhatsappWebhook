@@ -1,39 +1,43 @@
+// Import required modules
 const express = require("express");
 const body_parser = require("body-parser");
 const axios = require("axios");
 require("dotenv").config();
 
+// Load environment variables
 const token = process.env.TOKEN;
-const myToken = "Achhaya";
+const myToken = process.env.MYTOKEN;
 
+// Create Express application
 const app = express();
 
+// Use body-parser middleware to parse incoming JSON data
 app.use(body_parser.json());
 
+// Define a route for the home page
 app.get("/", (req, res) => {
-  console.log("home");
   res.send("Starting point of our whatsapp bot");
 });
 
+// Define a route for the webhook verification
 app.get("/webhook", (req, res) => {
   let mode = req.query["hub.mode"];
   let challenge = req.query["hub.challenge"];
   let token = req.query["hub.verify_token"];
 
-  console.log(mode + challenge + token);
-
+  // Check if the provided mode and token match the expected values for subscription
   if (mode === "subscribe" && token === myToken) {
-    console.log("success");
+    // Send a challenge response to verify the webhook
     res.status(200).send(challenge);
   } else {
-    console.log("subscription failed");
+    // Return a 403 Forbidden status with a message for invalid tokens
     res.status(403).send("Subscription Failed: Invalid Token");
   }
 });
 
+// Define a route to handle incoming webhook events
 app.post("/webhook", (req, res) => {
   let body = req.body;
-  console.log(JSON.stringify(body));
 
   if (body.object) {
     if (
@@ -42,10 +46,12 @@ app.post("/webhook", (req, res) => {
       body.entry[0].changes[0].value.messages &&
       body.entry[0].changes[0].value.messages[0]
     ) {
+      // Extract information from the incoming message payload
       let phone_id = body.entry[0].changes[0].value.metadata.phone_number_id;
       let from = body.entry[0].changes[0].value.messages[0].from;
       let msg = body.entry[0].changes[0].value.messages[0].text.body;
 
+      // Send a response message using the axios library
       axios({
         method: "POST",
         url:
@@ -63,25 +69,24 @@ app.post("/webhook", (req, res) => {
             "Content-Type": "application/json",
           },
         },
-      })
-        .then(() => {
-          console.log("Message sent successfully");
+      }).then(() => {
+          // Send a 200 OK status and a success message when the message is sent
           res.status(200).send("Message sent successfully");
-        })
-        .catch((error) => {
-          console.error("Error sending message:", error);
+        }).catch((error) => {
+          // Send a 500 Internal Server Error status and an error message
           res.status(500).send("Error sending message");
         });
     } else {
-      console.log("Invalid message data");
+      // Send a 400 Bad Request status and a message for invalid message data
       res.status(400).send("Invalid message data");
     }
   } else {
-    console.log("Something went wrong");
+    // Send a 403 Forbidden status and a message for other errors
     res.status(403).send("Something went wrong");
   }
 });
 
+// Start the server on the specified port or default to 8080
 app.listen(process.env.PORT || "8080", () => {
   console.log("Server Started");
 });

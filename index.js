@@ -11,7 +11,7 @@ const app = express();
 app.use(body_parser.json());
 
 app.get('/', (req, res) => {
-    res.send("Haha")
+    res.send("Starting point of our whatsapp bot")
 })
 
 app.get('/webhook', (req, res) => {

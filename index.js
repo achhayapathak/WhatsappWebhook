@@ -11,8 +11,9 @@ const app = express();
 app.use(body_parser.json());
 
 app.get('/', (req, res) => {
+    console.log("home");
     res.send("Starting point of our whatsapp bot")
-})
+});
 
 app.get('/webhook', (req, res) => {
     let mode = req.query["hub.mode"];
@@ -21,11 +22,14 @@ app.get('/webhook', (req, res) => {
 
 
     if(mode === "subscribe" && token === myToken) {
+        console.log("success");
         res.status(200).send(challenge);
     } else {
+        console.log("success");
         res.status(403);
+        
     }
-})
+});
 
 
 app.post("/webhook", (req, res) => {
@@ -58,17 +62,19 @@ app.post("/webhook", (req, res) => {
                     }
                 });
                 
+                console.log("Message sent successfully");
                 res.status(200);
 
             } 
     } else {
+        console.log("Something went wrong")
         res.status(403);
     }
 
-})
+});
 
     
     
-app.listen('8000' || process.env.PORT, () => {
+app.listen(process.env.PORT || '8080', () => {
     console.log("Server Started");
 })

@@ -4,6 +4,14 @@ const body_parser = require("body-parser");
 const axios = require("axios");
 require("dotenv").config();
 
+const api_url = "https://api.quotable.io/random";
+
+const quote = async (url) => {
+  const response = await fetch(url);
+  const data = await response.json();
+  return data.content;
+}
+
 // Load environment variables
 const token = process.env.TOKEN;
 const myToken = process.env.MYTOKEN;
@@ -63,7 +71,7 @@ app.post("/webhook", (req, res) => {
           messaging_product: "whatsapp",
           to: from,
           text: {
-            body: "Your text was: " + msg,
+            body: quote(api_url),
           },
           headers: {
             "Content-Type": "application/json",

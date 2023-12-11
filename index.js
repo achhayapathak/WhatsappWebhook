@@ -44,7 +44,7 @@ app.get("/webhook", (req, res) => {
 });
 
 // Define a route to handle incoming webhook events
-app.post("/webhook", (req, res) => {
+app.post("/webhook", async (req, res) => {
   let body = req.body;
 
   if (body.object) {
@@ -71,7 +71,7 @@ app.post("/webhook", (req, res) => {
           messaging_product: "whatsapp",
           to: from,
           text: {
-            body: quote(api_url),
+            body: await quote(api_url),
           },
           headers: {
             "Content-Type": "application/json",
